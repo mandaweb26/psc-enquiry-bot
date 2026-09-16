@@ -9,7 +9,6 @@ from langchain_core.tools import tool
 @tool
 def court_price(day_type: str, court_type: str) -> str:
     """ Get the hourly court rental price at Pickle Social Club.
-
     day_type: 'peak' for weekday evenings after 5pm, weekends and
                public holidays.
               'off peak' for weekdays 7am to 5pm.
