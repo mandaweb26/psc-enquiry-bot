@@ -4,9 +4,13 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from agent import ask
+from channels import whatsapp
 
 # create the web application
 app = FastAPI(title="PSC Enquiry Bot")
+
+# attach the whatsapp channel to the service - our bot.
+app.include_router(whatsapp.router)
 
 # describes what a valid incoming request looks like
 class ChatRequest(BaseModel):
