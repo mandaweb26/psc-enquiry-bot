@@ -49,6 +49,17 @@ def ask_verbose(message: str) -> str:
             print(f" [{kind}] {str(m.text)[:80]}")
     return str(result["messages"][-1].text)
 
+# for the memory block
+def ask_detailed(message: str) -> dict:
+    """Like ask(), but also reports which tools the agent used."""
+    result = agent.invoke({"messages":[{"role":"user","content":message}]})
+    tools_used = [
+        tc["name"]
+        for m in result["messages"]
+        for tc in (getattr(m, "tool_calls", None) or [])
+    ]
+    return {"reply": str(result["messages"][-1].text), "tools_used": tools_used}
+
     
 
 if __name__ == "__main__":

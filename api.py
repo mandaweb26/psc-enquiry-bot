@@ -5,9 +5,13 @@ from pydantic import BaseModel
 
 from agent import ask
 from channels import whatsapp
+from agent import ask_detailed
+import log
 
 # create the web application
 app = FastAPI(title="PSC Enquiry Bot")
+
+log.setup()
 
 # attach the whatsapp channel to the service - our bot.
 app.include_router(whatsapp.router)
@@ -32,8 +36,23 @@ def health():
 # FastAPI reads the incoming JSON and hands you a checked ChatRequest object.
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest) -> ChatResponse:
-    """One customer message in, one reply out"""
-    # call the bot, wrap the answer, send it back.
-    return ChatResponse(reply=ask(req.message))
+    out = ask_detailed(req.message)
+    log.record("web", req.thread_id, req.message, out["reply"], out["tools_used"])
+    return ChatResponse(reply=out["reply"])
+
+#def chat(req: ChatRequest) -> ChatResponse:
+#    """One customer message in, one reply out"""
+#    # call the bot, wrap the answer, send it back.
+#    return ChatResponse(reply=ask(req.message))
+
+@app.get("/stats")
+def stats() -> dict:
+    """What are customers actually asking us?"""
+    return {"by_intent": dict(log.summary())}
+
+
+
+
+
 
 

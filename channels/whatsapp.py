@@ -2,7 +2,8 @@
 
 from fastapi import APIRouter
 
-from agent import ask
+from agent import ask_detailed
+import log
 
 router = APIRouter(prefix="/whatsapp", tags=["whatsapp"])
 
@@ -28,7 +29,10 @@ def webhook(payload: dict) -> dict:
     if text is None:
         return {"status": "ignored"}
 
-    reply = ask(text)
+    #reply = ask(text)
+    out = ask_detailed(text)
+    reply = out["reply"]
+    log.record("whatsapp", sender, text, reply, out['tools_used'])
 
     # A real integration would POST this back to WhatsApp's send API.
     print(f"-> to {sender}: {reply}")
